@@ -14,3 +14,14 @@ Here are some ideas to get you started:
 - 😄 Pronouns: ...
 - ⚡ Fun fact: ...
 -->
+
+## Calculator Usage
+
+The repository now includes a simple command line calculator. To perform calculations, run:
+
+```bash
+python calculator.py 3 add 4
+```
+
+This will output `7`.
+
