@@ -6,6 +6,8 @@ ops = {
     'sub': operator.sub,
     'mul': operator.mul,
     'div': operator.truediv,
+    'pow': operator.pow,
+    'mod': operator.mod,
 }
 
 def main():

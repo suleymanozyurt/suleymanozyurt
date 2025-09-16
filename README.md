@@ -25,3 +25,14 @@ python calculator.py 3 add 4
 
 This will output `7`.
 
+### Supported Operations
+
+The calculator understands the following operations:
+
+- `add` – addition
+- `sub` – subtraction
+- `mul` – multiplication
+- `div` – true division
+- `pow` – exponentiation
+- `mod` – modulo (remainder)
+
