@@ -50,7 +50,6 @@ h1 small{display:block;font-weight:400;font-size:.8125rem;color:var(--muted);mar
 .btn svg{width:17px;height:17px}
 .call{background:var(--call);color:var(--call-ink)}
 .wa{background:var(--wa);color:var(--wa-ink)}
-.flat{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 
 .bar{
   position:fixed;left:0;right:0;bottom:0;background:var(--bg);
@@ -61,10 +60,7 @@ h1 small{display:block;font-weight:400;font-size:.8125rem;color:var(--muted);mar
   width:100%;font:15px/1.4 system-ui,sans-serif;color:var(--ink);background:var(--card);
   border:1px solid var(--line);border-radius:12px;padding:11px 13px;resize:none;height:60px;
 }
-#step{font:.8125rem/1.3 system-ui,sans-serif;color:var(--muted);text-align:center}
-#step b{color:var(--ink)}
-.two{display:grid;grid-template-columns:1fr 2fr;gap:8px}
-.hide{display:none}
+#step{margin:0;font:.8125rem/1.3 system-ui,sans-serif;color:var(--muted);text-align:center}
 </style>
 </head>
 <body>
@@ -75,15 +71,9 @@ h1 small{display:block;font-weight:400;font-size:.8125rem;color:var(--muted);mar
 
 <div class="bar">
   <div class="in">
-    <textarea id="msg" placeholder="Mesajını yaz, sonra Hepsine gönder…"></textarea>
+    <textarea id="msg" placeholder="Mesaj yaz — butonlara basınca hazır gelir"></textarea>
     <button class="btn wa" id="start">Hepsine gönder</button>
-    <div id="run" class="hide">
-      <p id="step"></p>
-      <div class="two">
-        <button class="btn flat" id="skip">Atla</button>
-        <button class="btn wa" id="open">WhatsApp'ta aç</button>
-      </div>
-    </div>
+    <p id="step"></p>
   </div>
 </div>
 
@@ -110,43 +100,37 @@ document.getElementById("list").innerHTML = PEOPLE.map(function (p) {
     '<a class="ph" href="tel:+' + intl(p.tel) + '">' + pretty(p.tel) + '</a>' +
     '<div class="row">' +
       '<a class="btn call" href="tel:+' + intl(p.tel) + '">' + PHONE + 'Ara</a>' +
-      '<a class="btn wa" href="' + wa(p.tel, "") + '" target="_blank" rel="noopener">' + WA + 'Mesaj</a>' +
+      '<a class="btn wa" data-tel="' + p.tel + '" href="' + wa(p.tel, "") + '" target="_blank" rel="noopener">' + WA + 'Mesaj</a>' +
     '</div></div>';
 }).join("");
 
-/* Hepsine gönder: WhatsApp toplu linke izin vermez, kişileri sırayla açarız */
-var i = 0;
 var msg = document.getElementById("msg");
-var run = document.getElementById("run");
 var step = document.getElementById("step");
 var start = document.getElementById("start");
+var links = document.querySelectorAll("[data-tel]");
 
-function show() {
-  if (i >= PEOPLE.length) {
-    run.classList.add("hide");
-    start.classList.remove("hide");
-    start.textContent = "Hepsine gönder";
-    step.textContent = "";
-    i = 0;
-    return;
+/* Yazdığın mesaj anında butonlara işlenir: tek dokunuş, WhatsApp hazır açılır */
+msg.oninput = function () {
+  for (var n = 0; n < links.length; n++) {
+    links[n].href = wa(links[n].dataset.tel, msg.value.trim());
   }
-  step.innerHTML = (i + 1) + " / " + PEOPLE.length + " — <b>" + PEOPLE[i].name + "</b>";
-}
+};
+
+/* Hepsine gönder: WhatsApp toplu linke izin vermez — her dokunuş sıradakini açar */
+var i = 0;
 
 start.onclick = function () {
-  if (!msg.value.trim()) { msg.focus(); return; }
-  i = 0;
-  start.classList.add("hide");
-  run.classList.remove("hide");
-  show();
-};
-
-document.getElementById("open").onclick = function () {
   window.open(wa(PEOPLE[i].tel, msg.value.trim()), "_blank", "noopener");
-  i++; show();
+  i++;
+  if (i >= PEOPLE.length) {
+    i = 0;
+    start.textContent = "Hepsine gönder";
+    step.textContent = "Liste bitti ✓";
+    return;
+  }
+  start.textContent = "Sıradaki: " + PEOPLE[i].name;
+  step.textContent = (i + 1) + " / " + PEOPLE.length;
 };
-
-document.getElementById("skip").onclick = function () { i++; show(); };
 </script>
 </body>
 </html>
