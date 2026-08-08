@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nöbet</title>
+<style>
+:root{
+  --bg:#edf0ee; --card:#fff; --ink:#121a17; --muted:#5b6a64; --line:#dde3e0;
+  --call:#b8401c; --call-ink:#fff; --wa:#0f7c6c; --wa-ink:#fff; --chip:#e6ebe8;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1412; --card:#16201d; --ink:#e7edea; --muted:#93a59f; --line:#253330;
+    --call:#f4794c; --call-ink:#2a0d03; --wa:#2bbf9a; --wa-ink:#04231c; --chip:#22302c;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1412; --card:#16201d; --ink:#e7edea; --muted:#93a59f; --line:#253330;
+  --call:#f4794c; --call-ink:#2a0d03; --wa:#2bbf9a; --wa-ink:#04231c; --chip:#22302c;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding:20px 16px calc(150px + env(safe-area-inset-bottom));
+}
+main{max-width:480px;margin:0 auto}
+h1{font-size:1.125rem;font-weight:650;letter-spacing:-.015em;margin:0 0 16px}
+h1 small{display:block;font-weight:400;font-size:.8125rem;color:var(--muted);margin-top:2px}
+:where(a,button,input):focus-visible{outline:2px solid var(--wa);outline-offset:2px}
+
+#frame{
+  margin:0 0 14px;padding:11px 13px;border-radius:12px;font-size:.875rem;line-height:1.45;
+  background:var(--card);border:1px solid var(--call);color:var(--ink);
+}
+#frame a{color:var(--call);font-weight:600;white-space:nowrap}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.tag{
+  display:inline-block;background:var(--chip);color:var(--muted);border-radius:6px;
+  padding:3px 8px;font:600 .6875rem/1.3 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;
+}
+.nm{font-size:1.0625rem;font-weight:600;letter-spacing:-.015em;margin:8px 0 2px}
+.ph{
+  display:block;margin-bottom:12px;color:var(--muted);text-decoration:none;
+  font:.9375rem ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;
+}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:13px 8px;border:0;border-radius:12px;cursor:pointer;text-decoration:none;
+  font:600 .9375rem system-ui,sans-serif;
+}
+.btn:active{transform:translateY(1px)}
+.btn svg{width:17px;height:17px}
+.call{background:var(--call);color:var(--call-ink)}
+.wa{background:var(--wa);color:var(--wa-ink)}
+.flat{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+
+.bar{
+  position:fixed;left:0;right:0;bottom:0;background:var(--bg);
+  border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+}
+.bar .in{max-width:480px;margin:0 auto;display:grid;gap:8px}
+#msg{
+  width:100%;font:15px/1.4 system-ui,sans-serif;color:var(--ink);background:var(--card);
+  border:1px solid var(--line);border-radius:12px;padding:11px 13px;resize:none;height:60px;
+}
+#step{margin:0;font:.8125rem/1.3 system-ui,sans-serif;color:var(--muted);text-align:center}
+.two{display:grid;grid-template-columns:1fr 2fr;gap:8px}
+</style>
+</head>
+<body>
+<main>
+  <p id="frame" hidden>Bu sayfa bir çerçeve içinde açıldı, tarayıcı butonları engelliyor.
+    <a id="frameOut" target="_blank" rel="noopener" href="#">Yeni sekmede aç →</a></p>
+  <h1>Hafta sonu nöbet<small>Ara, ya da hepsine sırayla WhatsApp mesajı at</small></h1>
+  <div id="list"></div>
+</main>
+
+<div class="bar">
+  <div class="in">
+    <textarea id="msg" placeholder="Mesaj yaz — butonlara basınca hazır gelir"></textarea>
+    <div class="two">
+      <button class="btn flat" id="copy">Kopyala</button>
+      <a class="btn wa" id="start" target="_blank" rel="noopener" href="#">Hepsine gönder</a>
+    </div>
+    <p id="step">WhatsApp açılınca gönder tuşuna basmayı unutma</p>
+  </div>
+</div>
+
+<script>
+var PEOPLE = [
+  { duty:"Orman Muhafaza · Cmt+Paz", name:"Uğur Öztürk",    tel:"05303443206" },
+  { duty:"Arazöz · Cumartesi",       name:"Ahmet Özkan",    tel:"05323175808" },
+  { duty:"Arazöz · Pazar",           name:"Ali Özdemir",    tel:"05312288532" },
+  { duty:"142 · Cmt+Paz",            name:"Rıza Yüstaş",    tel:"05455340156" },
+  { duty:"107 · Cmt+Paz",            name:"İbrahim Durmuş", tel:"05427106940" }
+];
+
+var PHONE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1l-2.3 2.2Z"/></svg>';
+var WA = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.42 1.31-1.96 1.35-.5.04-.98.21-3.3-.69-2.79-1.1-4.55-3.96-4.69-4.15-.13-.19-1.11-1.48-1.11-2.83 0-1.35.71-2.01.96-2.29.25-.28.54-.35.72-.35h.52c.17 0 .39-.06.61.47.24.56.8 1.94.87 2.08.07.14.12.3.02.49-.09.19-.14.3-.28.47-.14.16-.3.36-.42.49-.14.14-.29.29-.12.57.16.28.73 1.2 1.56 1.95 1.07.95 1.98 1.25 2.26 1.39.28.14.44.12.61-.07.16-.19.7-.81.88-1.09.19-.28.37-.23.63-.14.25.09 1.63.77 1.91.91.28.14.47.21.54.32.07.12.07.66-.17 1.34Z"/></svg>';
+
+function intl(t){ return "90" + t.replace(/\D/g,"").replace(/^0/,""); }
+function pretty(t){ return t.replace(/(\d{4})(\d{3})(\d{2})(\d{2})/, "$1 $2 $3 $4"); }
+function wa(t, msg){ return "https://wa.me/" + intl(t) + (msg ? "?text=" + encodeURIComponent(msg) : ""); }
+
+document.getElementById("list").innerHTML = PEOPLE.map(function (p) {
+  return '<div class="card">' +
+    '<span class="tag">' + p.duty + '</span>' +
+    '<div class="nm">' + p.name + '</div>' +
+    '<a class="ph" href="tel:+' + intl(p.tel) + '">' + pretty(p.tel) + '</a>' +
+    '<div class="row">' +
+      '<a class="btn call" href="tel:+' + intl(p.tel) + '">' + PHONE + 'Ara</a>' +
+      '<a class="btn wa" data-tel="' + p.tel + '" href="' + wa(p.tel, "") + '" target="_blank" rel="noopener">' + WA + 'Mesaj</a>' +
+    '</div></div>';
+}).join("");
+
+var msg = document.getElementById("msg");
+var step = document.getElementById("step");
+var start = document.getElementById("start");
+var links = document.querySelectorAll("[data-tel]");
+
+/* Hepsine gönder de düz bir bağlantı: tarayıcı pencere engellemesine takılmaz */
+var i = 0;
+
+function refresh() {
+  var text = msg.value.trim();
+  for (var n = 0; n < links.length; n++) {
+    links[n].href = wa(links[n].dataset.tel, text);
+  }
+  start.href = wa(PEOPLE[i].tel, text);
+}
+
+msg.oninput = refresh;
+
+start.onclick = function () {
+  // Bağlantı açıldıktan sonra sıradaki kişiye geç
+  setTimeout(function () {
+    i++;
+    if (i >= PEOPLE.length) {
+      i = 0;
+      start.textContent = "Hepsine gönder";
+      step.textContent = "Liste bitti ✓ — baştan almak için tekrar bas";
+    } else {
+      start.textContent = "Sıradaki: " + PEOPLE[i].name;
+      step.textContent = (i + 1) + " / " + PEOPLE.length + " — WhatsApp'ta gönder tuşuna bas";
+    }
+    refresh();
+  }, 0);
+};
+
+document.getElementById("copy").onclick = function () {
+  var t = msg.value.trim();
+  if (!t) { msg.focus(); return; }
+  if (navigator.clipboard) navigator.clipboard.writeText(t);
+  else { msg.select(); document.execCommand("copy"); }
+  step.textContent = "Mesaj kopyalandı — WhatsApp'ta yapıştırabilirsin";
+};
+
+refresh();
+
+/* Çerçeve içinde açıldıysa tarayıcı tel: ve wa.me bağlantılarını engeller — çıkış yolu göster */
+if (window.self !== window.top) {
+  document.getElementById("frameOut").href = location.href;
+  document.getElementById("frame").hidden = false;
+}
+</script>
+</body>
+</html>
