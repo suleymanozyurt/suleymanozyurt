@@ -3,811 +3,150 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#edf0ee">
-<meta name="description" content="Hafta sonu nöbet listesi — tek dokunuşla ara, WhatsApp'tan toplu mesaj gönder.">
-<title>Hafta Sonu Nöbet</title>
+<title>Nöbet</title>
 <style>
 :root{
-  --bg:#edf0ee;
-  --surface:#ffffff;
-  --surface-2:#f5f7f5;
-  --ink:#121a17;
-  --muted:#5b6a64;
-  --line:#d6ddd9;
-  --line-soft:#e4e9e6;
-  --call:#b8401c;
-  --call-ink:#ffffff;
-  --wa:#0f7c6c;
-  --wa-ink:#ffffff;
-  --chip:#e6ebe8;
-  --focus:#1f6f5c;
-  --shadow:0 1px 2px rgba(18,26,23,.06), 0 8px 24px -16px rgba(18,26,23,.35);
-  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  --mono:ui-monospace,"SF Mono","Cascadia Mono","Roboto Mono",Menlo,Consolas,monospace;
+  --bg:#edf0ee; --card:#fff; --ink:#121a17; --muted:#5b6a64; --line:#dde3e0;
+  --call:#b8401c; --call-ink:#fff; --wa:#0f7c6c; --wa-ink:#fff; --chip:#e6ebe8;
 }
-@media (prefers-color-scheme: dark){
+@media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#0d1412;
-    --surface:#16201d;
-    --surface-2:#1c2724;
-    --ink:#e7edea;
-    --muted:#93a59f;
-    --line:#253330;
-    --line-soft:#1f2b28;
-    --call:#f4794c;
-    --call-ink:#2a0d03;
-    --wa:#2bbf9a;
-    --wa-ink:#04231c;
-    --chip:#22302c;
-    --focus:#5fd3b4;
-    --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 28px -18px rgba(0,0,0,.9);
+    --bg:#0d1412; --card:#16201d; --ink:#e7edea; --muted:#93a59f; --line:#253330;
+    --call:#f4794c; --call-ink:#2a0d03; --wa:#2bbf9a; --wa-ink:#04231c; --chip:#22302c;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0d1412;
-  --surface:#16201d;
-  --surface-2:#1c2724;
-  --ink:#e7edea;
-  --muted:#93a59f;
-  --line:#253330;
-  --line-soft:#1f2b28;
-  --call:#f4794c;
-  --call-ink:#2a0d03;
-  --wa:#2bbf9a;
-  --wa-ink:#04231c;
-  --chip:#22302c;
-  --focus:#5fd3b4;
-  --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 28px -18px rgba(0,0,0,.9);
+  --bg:#0d1412; --card:#16201d; --ink:#e7edea; --muted:#93a59f; --line:#253330;
+  --call:#f4794c; --call-ink:#2a0d03; --wa:#2bbf9a; --wa-ink:#04231c; --chip:#22302c;
 }
-
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
 body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:var(--sans);
-  font-size:16px;
-  line-height:1.45;
-  -webkit-font-smoothing:antialiased;
-  padding-bottom:calc(96px + env(safe-area-inset-bottom));
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding:20px 16px calc(150px + env(safe-area-inset-bottom));
 }
-.wrap{max-width:640px;margin:0 auto;padding:0 16px}
-:where(a,button,input,textarea,summary):focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:10px}
+main{max-width:480px;margin:0 auto}
+h1{font-size:1.125rem;font-weight:650;letter-spacing:-.015em;margin:0 0 16px}
+h1 small{display:block;font-weight:400;font-size:.8125rem;color:var(--muted);margin-top:2px}
+:where(a,button,input):focus-visible{outline:2px solid var(--wa);outline-offset:2px}
 
-/* ---------- header ---------- */
-.top{
-  position:sticky;top:0;z-index:30;
-  background:color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter:saturate(1.4) blur(10px);
-  border-bottom:1px solid var(--line-soft);
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.tag{
+  display:inline-block;background:var(--chip);color:var(--muted);border-radius:6px;
+  padding:3px 8px;font:600 .6875rem/1.3 ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;
 }
-.bar{display:flex;align-items:center;gap:10px;padding:12px 0 10px}
-h1{font-size:1.0625rem;font-weight:650;letter-spacing:-.01em;margin:0;flex:1}
-h1 small{display:block;font-weight:450;font-size:.75rem;color:var(--muted);letter-spacing:.02em}
-.ghost{
-  appearance:none;background:transparent;border:1px solid var(--line);
-  color:var(--muted);font:inherit;font-size:.8125rem;font-weight:550;
-  padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;
+.nm{font-size:1.0625rem;font-weight:600;letter-spacing:-.015em;margin:8px 0 2px}
+.ph{
+  display:block;margin-bottom:12px;color:var(--muted);text-decoration:none;
+  font:.9375rem ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;
 }
-.ghost:hover{color:var(--ink);border-color:var(--muted)}
-.ghost[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-
-.days{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 0 12px}
-.day{
-  appearance:none;cursor:pointer;font:inherit;font-weight:600;
-  padding:11px 8px;border-radius:12px;
-  border:1px solid var(--line);background:var(--surface);color:var(--muted);
-  display:flex;flex-direction:column;align-items:center;gap:1px;
-}
-.day b{font-size:.9375rem;letter-spacing:-.01em}
-.day span{font-family:var(--mono);font-size:.6875rem;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
-.day[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-
-/* ---------- list ---------- */
-.listhead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0 10px}
-.selall{display:inline-flex;align-items:center;gap:9px;font-size:.875rem;color:var(--muted);cursor:pointer;user-select:none}
-.hint{font-family:var(--mono);font-size:.6875rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-
-ul.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
-.card{
-  background:var(--surface);border:1px solid var(--line-soft);border-radius:16px;
-  padding:14px;box-shadow:var(--shadow);
-  display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;
-  transition:border-color .15s ease;
-}
-.card.on{border-color:var(--focus)}
-input[type=checkbox]{
-  appearance:none;width:22px;height:22px;margin:0;flex:none;cursor:pointer;
-  border:1.5px solid var(--line);border-radius:7px;background:var(--surface-2);
-  display:grid;place-content:center;transition:.12s ease;
-}
-input[type=checkbox]::after{
-  content:"";width:11px;height:6px;border:2px solid var(--bg);border-top:0;border-right:0;
-  transform:rotate(-45deg) scale(.4);opacity:0;transition:.12s ease;
-}
-input[type=checkbox]:checked{background:var(--ink);border-color:var(--ink)}
-input[type=checkbox]:checked::after{opacity:1;transform:rotate(-45deg) scale(1)}
-
-.body{min-width:0;display:flex;flex-direction:column;gap:10px}
-.code{
-  display:inline-block;font-family:var(--mono);font-size:.6875rem;font-weight:600;
-  letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
-  background:var(--chip);border-radius:6px;padding:3px 7px;
-}
-.name{margin:6px 0 1px;font-size:1.0625rem;font-weight:600;letter-spacing:-.015em;overflow-wrap:anywhere}
-.tel{
-  font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.9375rem;
-  color:var(--muted);text-decoration:none;letter-spacing:.01em;
-}
-.tel:hover{color:var(--ink)}
-.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .btn{
-  appearance:none;cursor:pointer;font:inherit;font-weight:600;font-size:.9375rem;
-  border:0;border-radius:12px;padding:12px 10px;text-decoration:none;
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  transition:filter .15s ease,transform .06s ease;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:13px 8px;border:0;border-radius:12px;cursor:pointer;text-decoration:none;
+  font:600 .9375rem system-ui,sans-serif;
 }
 .btn:active{transform:translateY(1px)}
-.btn:hover{filter:brightness(1.06)}
-.btn svg{width:17px;height:17px;flex:none}
-.btn.call{background:var(--call);color:var(--call-ink)}
-.btn.wa{background:var(--wa);color:var(--wa-ink)}
-.btn.flat{background:var(--surface-2);color:var(--ink);border:1px solid var(--line)}
+.btn svg{width:17px;height:17px}
+.call{background:var(--call);color:var(--call-ink)}
+.wa{background:var(--wa);color:var(--wa-ink)}
+.flat{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 
-/* ---------- edit mode ---------- */
-.field{display:flex;flex-direction:column;gap:5px}
-.field label{font-family:var(--mono);font-size:.625rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-input[type=text],input[type=tel],textarea{
-  width:100%;font:inherit;color:var(--ink);background:var(--surface-2);
-  border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+.bar{
+  position:fixed;left:0;right:0;bottom:0;background:var(--bg);
+  border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));
 }
-input[type=tel]{font-family:var(--mono);font-variant-numeric:tabular-nums}
-textarea{min-height:120px;resize:vertical;line-height:1.5}
-.editgrid{display:flex;flex-direction:column;gap:10px}
-.rowtools{display:flex;gap:8px;justify-content:flex-end}
-.link{
-  appearance:none;background:none;border:0;font:inherit;font-size:.8125rem;font-weight:550;
-  color:var(--muted);cursor:pointer;padding:6px 2px;text-decoration:underline;text-underline-offset:3px;
+.bar .in{max-width:480px;margin:0 auto;display:grid;gap:8px}
+#msg{
+  width:100%;font:15px/1.4 system-ui,sans-serif;color:var(--ink);background:var(--card);
+  border:1px solid var(--line);border-radius:12px;padding:11px 13px;resize:none;height:60px;
 }
-.link:hover{color:var(--call)}
-.tools{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0 4px}
-.note{font-size:.8125rem;color:var(--muted);padding:10px 0 0;line-height:1.5}
-
-/* ---------- bulk bar ---------- */
-.bulkbar{
-  position:fixed;left:0;right:0;bottom:0;z-index:40;
-  padding:12px 16px calc(12px + env(safe-area-inset-bottom));
-  background:color-mix(in srgb, var(--bg) 92%, transparent);
-  backdrop-filter:saturate(1.4) blur(10px);
-  border-top:1px solid var(--line);
-  transform:translateY(115%);transition:transform .22s cubic-bezier(.2,.7,.3,1);
-}
-.bulkbar.show{transform:none}
-.bulkinner{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:12px}
-.bulkinner .n{
-  font-family:var(--mono);font-size:.75rem;letter-spacing:.05em;color:var(--muted);flex:1;line-height:1.3;
-}
-.bulkinner .n b{display:block;font-family:var(--sans);font-size:.9375rem;letter-spacing:-.01em;color:var(--ink)}
-
-/* ---------- modal ---------- */
-.scrim{
-  position:fixed;inset:0;z-index:50;background:rgba(9,14,12,.55);
-  display:none;align-items:flex-end;justify-content:center;
-}
-.scrim.show{display:flex}
-.sheet{
-  width:100%;max-width:640px;max-height:92vh;overflow-y:auto;
-  background:var(--bg);border-radius:20px 20px 0 0;
-  border:1px solid var(--line);border-bottom:0;
-  padding:18px 16px calc(20px + env(safe-area-inset-bottom));
-  animation:rise .24s cubic-bezier(.2,.7,.3,1);
-}
-@keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
-@media (prefers-reduced-motion: reduce){
-  .sheet{animation:none}
-  .bulkbar{transition:none}
-}
-.sheethead{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
-.sheethead h2{margin:0;font-size:1.0625rem;font-weight:650;letter-spacing:-.015em;flex:1}
-.sheethead p{margin:4px 0 0;font-size:.8125rem;color:var(--muted);line-height:1.5}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
-.chip{
-  font-size:.8125rem;background:var(--chip);color:var(--ink);
-  border-radius:999px;padding:5px 11px;border:1px solid var(--line-soft);
-}
-.tmpl{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
-.tmpl button{
-  appearance:none;cursor:pointer;font:inherit;font-size:.8125rem;
-  background:var(--surface);border:1px solid var(--line);color:var(--muted);
-  border-radius:999px;padding:6px 12px;
-}
-.tmpl button:hover{color:var(--ink);border-color:var(--muted)}
-
-.queue{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
-.q{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
-  font-size:.9375rem;color:var(--muted);
-}
-.q .qi{
-  font-family:var(--mono);font-size:.6875rem;width:22px;height:22px;flex:none;
-  border:1px solid var(--line);border-radius:7px;display:grid;place-content:center;
-}
-.q.now{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:var(--shadow)}
-.q.done{color:var(--muted)}
-.q.done .qi{background:var(--wa);border-color:var(--wa);color:var(--wa-ink)}
-.q.skip .qi{opacity:.45}
-.q .qp{margin-left:auto;font-family:var(--mono);font-size:.75rem;font-variant-numeric:tabular-nums;opacity:.8}
-.stack{display:grid;gap:8px;margin-top:16px}
-.stack.two{grid-template-columns:1fr 1fr}
-.big{font-size:1rem;padding:14px}
-.done-msg{text-align:center;padding:18px 0 6px}
-.done-msg b{display:block;font-size:1.125rem;letter-spacing:-.015em}
-.done-msg span{font-size:.875rem;color:var(--muted)}
-.hidden{display:none !important}
-.toast{
-  position:fixed;left:50%;bottom:calc(104px + env(safe-area-inset-bottom));transform:translate(-50%,10px);
-  background:var(--ink);color:var(--bg);font-size:.875rem;font-weight:550;
-  padding:10px 16px;border-radius:999px;z-index:60;opacity:0;pointer-events:none;
-  transition:opacity .2s ease,transform .2s ease;
-}
-.toast.show{opacity:1;transform:translate(-50%,0)}
+#step{font:.8125rem/1.3 system-ui,sans-serif;color:var(--muted);text-align:center}
+#step b{color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr 2fr;gap:8px}
+.hide{display:none}
 </style>
 </head>
 <body>
-
-<header class="top">
-  <div class="wrap">
-    <div class="bar">
-      <h1>Hafta Sonu Nöbet<small id="subtitle">Ara veya WhatsApp'tan toplu mesaj at</small></h1>
-      <button class="ghost" id="editToggle" aria-pressed="false">Düzenle</button>
-    </div>
-    <div class="days" role="tablist" aria-label="Gün seçimi">
-      <button class="day" role="tab" data-day="0" aria-selected="true"><b>Cumartesi</b><span id="d0">nöbet</span></button>
-      <button class="day" role="tab" data-day="1" aria-selected="false"><b>Pazar</b><span id="d1">nöbet</span></button>
-    </div>
-  </div>
-</header>
-
-<main class="wrap">
-  <div class="listhead">
-    <label class="selall"><input type="checkbox" id="selectAll"> Tümünü seç</label>
-    <span class="hint" id="selCount">seçili yok</span>
-  </div>
-
-  <ul class="list" id="list"></ul>
-
-  <div class="tools hidden" id="editTools">
-    <button class="ghost" id="addRow">+ Görev ekle</button>
-    <button class="ghost" id="exportBtn">Yedek al</button>
-    <button class="ghost" id="importBtn">Yedeği yükle</button>
-    <button class="ghost" id="resetBtn">Listeyi sıfırla</button>
-    <input type="file" id="importFile" accept="application/json" class="hidden">
-  </div>
-  <p class="note" id="editNote" hidden>Değişiklikler bu telefonda otomatik kaydedilir. Uygulamayı başkasına gönderdiğinde dosyanın içindeki liste gider — kendi düzenlemelerini paylaşmak istersen “Yedek al” dosyasını da gönder.</p>
+<main>
+  <h1>Hafta sonu nöbet<small>Ara, ya da hepsine sırayla WhatsApp mesajı at</small></h1>
+  <div id="list"></div>
 </main>
 
-<div class="bulkbar" id="bulkbar">
-  <div class="bulkinner">
-    <div class="n"><b id="bulkCount">0 kişi seçildi</b><span id="bulkNames"></span></div>
-    <button class="btn wa" id="openCompose">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.42 1.31-1.96 1.35-.5.04-.98.21-3.3-.69-2.79-1.1-4.55-3.96-4.69-4.15-.13-.19-1.11-1.48-1.11-2.83 0-1.35.71-2.01.96-2.29.25-.28.54-.35.72-.35h.52c.17 0 .39-.06.61.47.24.56.8 1.94.87 2.08.07.14.12.3.02.49-.09.19-.14.3-.28.47-.14.16-.3.36-.42.49-.14.14-.29.29-.12.57.16.28.73 1.2 1.56 1.95 1.07.95 1.98 1.25 2.26 1.39.28.14.44.12.61-.07.16-.19.7-.81.88-1.09.19-.28.37-.23.63-.14.25.09 1.63.77 1.91.91.28.14.47.21.54.32.07.12.07.66-.17 1.34Z"/></svg>
-      Toplu mesaj
-    </button>
+<div class="bar">
+  <div class="in">
+    <textarea id="msg" placeholder="Mesajını yaz, sonra Hepsine gönder…"></textarea>
+    <button class="btn wa" id="start">Hepsine gönder</button>
+    <div id="run" class="hide">
+      <p id="step"></p>
+      <div class="two">
+        <button class="btn flat" id="skip">Atla</button>
+        <button class="btn wa" id="open">WhatsApp'ta aç</button>
+      </div>
+    </div>
   </div>
 </div>
-
-<div class="scrim" id="scrim" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
-  <div class="sheet" id="sheet">
-
-    <section id="stepCompose">
-      <div class="sheethead">
-        <div>
-          <h2 id="sheetTitle">Toplu WhatsApp mesajı</h2>
-          <p>WhatsApp tek tuşla toplu gönderime izin vermez. Bu sihirbaz kişileri tek tek açar, mesajı hazır yazar — sana sadece gönder tuşuna basmak kalır.</p>
-        </div>
-        <button class="ghost" id="closeCompose">Kapat</button>
-      </div>
-      <div class="chips" id="composeChips"></div>
-      <div class="field">
-        <label for="msg">Mesaj</label>
-        <textarea id="msg" placeholder="Mesajını yaz…"></textarea>
-      </div>
-      <div class="tmpl" id="templates"></div>
-      <div class="stack">
-        <button class="btn wa big" id="startQueue">Gönderime başla</button>
-      </div>
-    </section>
-
-    <section id="stepQueue" class="hidden">
-      <div class="sheethead">
-        <div>
-          <h2>Sırayla gönder</h2>
-          <p id="queueProgress">1 / 1</p>
-        </div>
-        <button class="ghost" id="closeQueue">Bitir</button>
-      </div>
-      <ul class="queue" id="queueList"></ul>
-      <div class="stack two" id="queueButtons">
-        <button class="btn flat" id="skipOne">Atla</button>
-        <button class="btn wa" id="sendOne">WhatsApp'ta aç</button>
-      </div>
-      <div class="done-msg hidden" id="queueDone">
-        <b>Gönderim listesi bitti</b>
-        <span id="doneSummary"></span>
-      </div>
-    </section>
-
-  </div>
-</div>
-
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-(function () {
-  "use strict";
+var PEOPLE = [
+  { duty:"Orman Muhafaza · Cmt+Paz", name:"Uğur Öztürk",    tel:"05303443206" },
+  { duty:"Arazöz · Cumartesi",       name:"Ahmet Özkan",    tel:"05323175808" },
+  { duty:"Arazöz · Pazar",           name:"Ali Özdemir",    tel:"05312288532" },
+  { duty:"142 · Cmt+Paz",            name:"Rıza Yüstaş",    tel:"05455340156" },
+  { duty:"107 · Cmt+Paz",            name:"İbrahim Durmuş", tel:"05427106940" }
+];
 
-  var STORAGE_KEY = "nobet-listesi-v1";
+var PHONE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1l-2.3 2.2Z"/></svg>';
+var WA = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.42 1.31-1.96 1.35-.5.04-.98.21-3.3-.69-2.79-1.1-4.55-3.96-4.69-4.15-.13-.19-1.11-1.48-1.11-2.83 0-1.35.71-2.01.96-2.29.25-.28.54-.35.72-.35h.52c.17 0 .39-.06.61.47.24.56.8 1.94.87 2.08.07.14.12.3.02.49-.09.19-.14.3-.28.47-.14.16-.3.36-.42.49-.14.14-.29.29-.12.57.16.28.73 1.2 1.56 1.95 1.07.95 1.98 1.25 2.26 1.39.28.14.44.12.61-.07.16-.19.7-.81.88-1.09.19-.28.37-.23.63-.14.25.09 1.63.77 1.91.91.28.14.47.21.54.32.07.12.07.66-.17 1.34Z"/></svg>';
 
-  var DEFAULTS = {
-    days: ["Cumartesi", "Pazar"],
-    rows: [
-      { label: "Orman Muhafaza", cells: [
-        { name: "Uğur Öztürk",    phone: "0530 344 32 06" },
-        { name: "Uğur Öztürk",    phone: "0530 344 32 06" } ] },
-      { label: "Arazöz", cells: [
-        { name: "Ahmet Özkan",    phone: "0532 317 58 08" },
-        { name: "Ali Özdemir",    phone: "0531 228 85 32" } ] },
-      { label: "142", cells: [
-        { name: "Rıza Yüstaş",    phone: "0545 534 01 56" },
-        { name: "Rıza Yüstaş",    phone: "0545 534 01 56" } ] },
-      { label: "107", cells: [
-        { name: "İbrahim Durmuş", phone: "0542 710 69 40" },
-        { name: "İbrahim Durmuş", phone: "0542 710 69 40" } ] }
-    ]
-  };
+function intl(t){ return "90" + t.replace(/\D/g,"").replace(/^0/,""); }
+function pretty(t){ return t.replace(/(\d{4})(\d{3})(\d{2})(\d{2})/, "$1 $2 $3 $4"); }
+function wa(t, msg){ return "https://wa.me/" + intl(t) + (msg ? "?text=" + encodeURIComponent(msg) : ""); }
 
-  var TEMPLATES = [
-    "Acil durum var. Mesajı görür görmez beni arayın.",
-    "Yangın ihbarı geldi. Nöbetçi ekipler hemen göreve.",
-    "Nöbet hatırlatması: bu hafta sonu nöbetçisiniz. Telefonunuz açık olsun."
-  ];
+document.getElementById("list").innerHTML = PEOPLE.map(function (p) {
+  return '<div class="card">' +
+    '<span class="tag">' + p.duty + '</span>' +
+    '<div class="nm">' + p.name + '</div>' +
+    '<a class="ph" href="tel:+' + intl(p.tel) + '">' + pretty(p.tel) + '</a>' +
+    '<div class="row">' +
+      '<a class="btn call" href="tel:+' + intl(p.tel) + '">' + PHONE + 'Ara</a>' +
+      '<a class="btn wa" href="' + wa(p.tel, "") + '" target="_blank" rel="noopener">' + WA + 'Mesaj</a>' +
+    '</div></div>';
+}).join("");
 
-  var state = {
-    day: 0,
-    edit: false,
-    selected: {},          // "gün:satır" -> true
-    data: load(),
-    queue: [],
-    qi: 0,
-    sent: 0,
-    skipped: 0
-  };
+/* Hepsine gönder: WhatsApp toplu linke izin vermez, kişileri sırayla açarız */
+var i = 0;
+var msg = document.getElementById("msg");
+var run = document.getElementById("run");
+var step = document.getElementById("step");
+var start = document.getElementById("start");
 
-  /* ---------- veri ---------- */
-
-  function clone(o) { return JSON.parse(JSON.stringify(o)); }
-
-  function load() {
-    try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return clone(DEFAULTS);
-      var parsed = JSON.parse(raw);
-      if (!parsed || !Array.isArray(parsed.rows)) return clone(DEFAULTS);
-      if (!Array.isArray(parsed.days) || parsed.days.length !== 2) parsed.days = clone(DEFAULTS.days);
-      parsed.rows = parsed.rows.filter(function (r) { return r && Array.isArray(r.cells); });
-      return parsed;
-    } catch (e) {
-      return clone(DEFAULTS);
-    }
+function show() {
+  if (i >= PEOPLE.length) {
+    run.classList.add("hide");
+    start.classList.remove("hide");
+    start.textContent = "Hepsine gönder";
+    step.textContent = "";
+    i = 0;
+    return;
   }
-
-  function save() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data)); } catch (e) { /* özel mod */ }
-  }
-
-  /* ---------- telefon ---------- */
-
-  function digits(v) { return String(v || "").replace(/\D/g, ""); }
-
-  // Türkiye numaralarını uluslararası biçime çevirir: 0532… -> 90532…
-  function intl(v) {
-    var d = digits(v);
-    if (!d) return "";
-    if (d.indexOf("0090") === 0) d = d.slice(4);
-    if (d.indexOf("90") === 0 && d.length === 12) return d;
-    if (d.indexOf("0") === 0) d = d.slice(1);
-    if (d.length === 10) return "90" + d;
-    return d;
-  }
-
-  function pretty(v) {
-    var d = digits(v);
-    if (d.indexOf("90") === 0 && d.length === 12) d = "0" + d.slice(2);
-    if (d.length === 10) d = "0" + d;
-    if (d.length !== 11) return String(v || "");
-    return d.slice(0, 4) + " " + d.slice(4, 7) + " " + d.slice(7, 9) + " " + d.slice(9, 11);
-  }
-
-  function telHref(v) { var i = intl(v); return i ? "tel:+" + i : "#"; }
-  function waHref(v, text) {
-    var i = intl(v);
-    if (!i) return "#";
-    return "https://wa.me/" + i + (text ? "?text=" + encodeURIComponent(text) : "");
-  }
-
-  /* ---------- yardımcılar ---------- */
-
-  var $ = function (id) { return document.getElementById(id); };
-
-  function el(tag, cls, text) {
-    var n = document.createElement(tag);
-    if (cls) n.className = cls;
-    if (text != null) n.textContent = text;
-    return n;
-  }
-
-  var toastTimer;
-  function toast(msg) {
-    var t = $("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2200);
-  }
-
-  var ICON_PHONE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1l-2.3 2.2Z"/></svg>';
-  var ICON_WA = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.42 1.31-1.96 1.35-.5.04-.98.21-3.3-.69-2.79-1.1-4.55-3.96-4.69-4.15-.13-.19-1.11-1.48-1.11-2.83 0-1.35.71-2.01.96-2.29.25-.28.54-.35.72-.35h.52c.17 0 .39-.06.61.47.24.56.8 1.94.87 2.08.07.14.12.3.02.49-.09.19-.14.3-.28.47-.14.16-.3.36-.42.49-.14.14-.29.29-.12.57.16.28.73 1.2 1.56 1.95 1.07.95 1.98 1.25 2.26 1.39.28.14.44.12.61-.07.16-.19.7-.81.88-1.09.19-.28.37-.23.63-.14.25.09 1.63.77 1.91.91.28.14.47.21.54.32.07.12.07.66-.17 1.34Z"/></svg>';
-
-  function cell(rowIndex, dayIndex) {
-    var row = state.data.rows[rowIndex];
-    if (!row) return null;
-    if (!row.cells[dayIndex]) row.cells[dayIndex] = { name: "", phone: "" };
-    return row.cells[dayIndex];
-  }
-
-  function key(day, row) { return day + ":" + row; }
-
-  function selectedList() {
-    var out = [], seen = {};
-    state.data.rows.forEach(function (row, ri) {
-      state.data.days.forEach(function (day, di) {
-        if (!state.selected[key(di, ri)]) return;
-        var c = row.cells[di];
-        if (!c || !intl(c.phone)) return;
-        var id = intl(c.phone);
-        if (seen[id]) return;
-        seen[id] = true;
-        out.push({ name: c.name || "İsimsiz", phone: c.phone, label: row.label, day: day });
-      });
-    });
-    return out;
-  }
-
-  /* ---------- görünüm ---------- */
-
-  function render() {
-    var list = $("list");
-    list.textContent = "";
-
-    state.data.rows.forEach(function (row, ri) {
-      list.appendChild(state.edit ? editCard(row, ri) : viewCard(row, ri));
-    });
-
-    state.data.days.forEach(function (name, di) {
-      var btn = document.querySelector('.day[data-day="' + di + '"]');
-      btn.setAttribute("aria-selected", state.day === di ? "true" : "false");
-      btn.querySelector("b").textContent = name;
-      var c = cell(0, di);
-      $("d" + di).textContent = (c && c.name) ? c.name.split(" ")[0] : "nöbet";
-    });
-
-    syncBulk();
-  }
-
-  function viewCard(row, ri) {
-    var c = row.cells[state.day] || { name: "", phone: "" };
-    var li = el("li", "card");
-    var k = key(state.day, ri);
-
-    var box = el("input");
-    box.type = "checkbox";
-    box.checked = !!state.selected[k];
-    box.setAttribute("aria-label", (c.name || row.label) + " seç");
-    box.addEventListener("change", function () {
-      if (box.checked) state.selected[k] = true; else delete state.selected[k];
-      li.classList.toggle("on", box.checked);
-      syncBulk();
-    });
-    li.classList.toggle("on", box.checked);
-    li.appendChild(box);
-
-    var body = el("div", "body");
-    var head = el("div");
-    head.appendChild(el("span", "code", row.label || "Görev"));
-    head.appendChild(el("h3", "name", c.name || "— boş —"));
-
-    var tel = el("a", "tel", pretty(c.phone));
-    tel.href = telHref(c.phone);
-    head.appendChild(tel);
-    body.appendChild(head);
-
-    if (intl(c.phone)) {
-      var acts = el("div", "acts");
-
-      var call = el("a", "btn call");
-      call.href = telHref(c.phone);
-      call.innerHTML = ICON_PHONE + "<span>Ara</span>";
-      acts.appendChild(call);
-
-      var wa = el("a", "btn wa");
-      wa.href = waHref(c.phone, "");
-      wa.target = "_blank";
-      wa.rel = "noopener";
-      wa.innerHTML = ICON_WA + "<span>WhatsApp</span>";
-      acts.appendChild(wa);
-
-      body.appendChild(acts);
-    }
-
-    li.appendChild(body);
-    return li;
-  }
-
-  function editCard(row, ri) {
-    var c = cell(ri, state.day);
-    var li = el("li", "card");
-    li.style.gridTemplateColumns = "1fr";
-
-    var grid = el("div", "editgrid");
-
-    grid.appendChild(field("Görev / kod", row.label, "text", function (v) {
-      row.label = v; save();
-    }));
-    grid.appendChild(field(state.data.days[state.day] + " — ad soyad", c.name, "text", function (v) {
-      c.name = v; save();
-    }));
-    grid.appendChild(field(state.data.days[state.day] + " — telefon", c.phone, "tel", function (v) {
-      c.phone = v; save();
-    }));
-
-    var tools = el("div", "rowtools");
-    var del = el("button", "link", "Bu görevi sil");
-    del.addEventListener("click", function () {
-      state.data.rows.splice(ri, 1);
-      state.selected = {};
-      save(); render();
-      toast("Görev silindi");
-    });
-    tools.appendChild(del);
-    grid.appendChild(tools);
-
-    li.appendChild(grid);
-    return li;
-  }
-
-  function field(labelText, value, type, onInput) {
-    var wrap = el("div", "field");
-    var id = "f" + Math.random().toString(36).slice(2, 8);
-    var lab = el("label", null, labelText);
-    lab.htmlFor = id;
-    var inp = el("input");
-    inp.type = type;
-    inp.id = id;
-    inp.value = value || "";
-    if (type === "tel") inp.inputMode = "tel";
-    inp.addEventListener("input", function () { onInput(inp.value); });
-    wrap.appendChild(lab);
-    wrap.appendChild(inp);
-    return wrap;
-  }
-
-  function syncBulk() {
-    var picked = selectedList();
-    var n = picked.length;
-
-    $("selCount").textContent = n ? n + " kişi seçili" : "seçili yok";
-    $("bulkCount").textContent = n + " kişi seçildi";
-    $("bulkNames").textContent = picked.map(function (p) { return p.name; }).join(", ");
-    $("bulkbar").classList.toggle("show", n > 0 && !state.edit);
-
-    var all = state.data.rows.length > 0 && state.data.rows.every(function (_, ri) {
-      return state.selected[key(state.day, ri)];
-    });
-    $("selectAll").checked = all;
-  }
-
-  /* ---------- toplu gönderim ---------- */
-
-  function openCompose() {
-    var picked = selectedList();
-    if (!picked.length) return;
-
-    var chips = $("composeChips");
-    chips.textContent = "";
-    picked.forEach(function (p) {
-      chips.appendChild(el("span", "chip", p.name + " · " + p.label));
-    });
-
-    var tmpl = $("templates");
-    tmpl.textContent = "";
-    TEMPLATES.forEach(function (t) {
-      var b = el("button", null, t.length > 34 ? t.slice(0, 32) + "…" : t);
-      b.type = "button";
-      b.title = t;
-      b.addEventListener("click", function () { $("msg").value = t; $("msg").focus(); });
-      tmpl.appendChild(b);
-    });
-
-    $("stepCompose").classList.remove("hidden");
-    $("stepQueue").classList.add("hidden");
-    $("scrim").classList.add("show");
-    document.body.style.overflow = "hidden";
-  }
-
-  function closeSheet() {
-    $("scrim").classList.remove("show");
-    document.body.style.overflow = "";
-  }
-
-  function startQueue() {
-    var text = $("msg").value.trim();
-    if (!text) { $("msg").focus(); toast("Önce mesajı yaz"); return; }
-
-    state.queue = selectedList().map(function (p) { p.status = "wait"; return p; });
-    state.qi = 0;
-    state.sent = 0;
-    state.skipped = 0;
-
-    $("stepCompose").classList.add("hidden");
-    $("stepQueue").classList.remove("hidden");
-    $("queueDone").classList.add("hidden");
-    $("queueButtons").classList.remove("hidden");
-    renderQueue();
-  }
-
-  function renderQueue() {
-    var total = state.queue.length;
-    var list = $("queueList");
-    list.textContent = "";
-
-    state.queue.forEach(function (p, i) {
-      var li = el("li", "q" + (i === state.qi ? " now" : "") + (p.status === "sent" ? " done" : "") + (p.status === "skip" ? " skip" : ""));
-      li.appendChild(el("span", "qi", p.status === "sent" ? "✓" : String(i + 1)));
-      li.appendChild(el("span", null, p.name));
-      li.appendChild(el("span", "qp", pretty(p.phone)));
-      list.appendChild(li);
-    });
-
-    if (state.qi >= total) {
-      $("queueProgress").textContent = "Tamamlandı";
-      $("queueButtons").classList.add("hidden");
-      $("queueDone").classList.remove("hidden");
-      $("doneSummary").textContent = state.sent + " kişiye açıldı" + (state.skipped ? ", " + state.skipped + " atlandı" : "");
-      return;
-    }
-
-    var cur = state.queue[state.qi];
-    $("queueProgress").textContent = (state.qi + 1) + " / " + total + " — " + cur.name + " · " + pretty(cur.phone);
-  }
-
-  function sendCurrent() {
-    var cur = state.queue[state.qi];
-    if (!cur) return;
-    window.open(waHref(cur.phone, $("msg").value.trim()), "_blank", "noopener");
-    cur.status = "sent";
-    state.sent++;
-    state.qi++;
-    renderQueue();
-  }
-
-  function skipCurrent() {
-    var cur = state.queue[state.qi];
-    if (!cur) return;
-    cur.status = "skip";
-    state.skipped++;
-    state.qi++;
-    renderQueue();
-  }
-
-  /* ---------- olaylar ---------- */
-
-  document.querySelectorAll(".day").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      state.day = Number(btn.dataset.day);
-      render();
-    });
-  });
-
-  $("selectAll").addEventListener("change", function () {
-    state.data.rows.forEach(function (_, ri) {
-      var k = key(state.day, ri);
-      if ($("selectAll").checked) state.selected[k] = true; else delete state.selected[k];
-    });
-    render();
-  });
-
-  $("editToggle").addEventListener("click", function () {
-    state.edit = !state.edit;
-    $("editToggle").setAttribute("aria-pressed", String(state.edit));
-    $("editToggle").textContent = state.edit ? "Bitti" : "Düzenle";
-    $("editTools").classList.toggle("hidden", !state.edit);
-    $("editNote").hidden = !state.edit;
-    $("subtitle").textContent = state.edit
-      ? "İsim ve numaraları güncelle"
-      : "Ara veya WhatsApp'tan toplu mesaj at";
-    render();
-  });
-
-  $("addRow").addEventListener("click", function () {
-    state.data.rows.push({ label: "Yeni görev", cells: [{ name: "", phone: "" }, { name: "", phone: "" }] });
-    save(); render();
-  });
-
-  $("resetBtn").addEventListener("click", function () {
-    if (!confirm("Liste fotoğraftaki ilk haline dönecek. Devam edilsin mi?")) return;
-    state.data = clone(DEFAULTS);
-    state.selected = {};
-    save(); render();
-    toast("Liste sıfırlandı");
-  });
-
-  $("exportBtn").addEventListener("click", function () {
-    var blob = new Blob([JSON.stringify(state.data, null, 2)], { type: "application/json" });
-    var a = el("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "nobet-listesi.json";
-    a.click();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-  });
-
-  $("importBtn").addEventListener("click", function () { $("importFile").click(); });
-
-  $("importFile").addEventListener("change", function () {
-    var file = $("importFile").files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function () {
-      try {
-        var parsed = JSON.parse(String(reader.result));
-        if (!parsed || !Array.isArray(parsed.rows)) throw new Error("biçim");
-        state.data = parsed;
-        if (!Array.isArray(state.data.days) || state.data.days.length !== 2) state.data.days = clone(DEFAULTS.days);
-        state.selected = {};
-        save(); render();
-        toast("Yedek yüklendi");
-      } catch (e) {
-        toast("Dosya okunamadı");
-      }
-      $("importFile").value = "";
-    };
-    reader.readAsText(file);
-  });
-
-  $("openCompose").addEventListener("click", openCompose);
-  $("closeCompose").addEventListener("click", closeSheet);
-  $("closeQueue").addEventListener("click", function () {
-    closeSheet();
-    if (state.sent) toast(state.sent + " kişiye mesaj açıldı");
-  });
-  $("startQueue").addEventListener("click", startQueue);
-  $("sendOne").addEventListener("click", sendCurrent);
-  $("skipOne").addEventListener("click", skipCurrent);
-
-  $("scrim").addEventListener("click", function (e) {
-    if (e.target === $("scrim")) closeSheet();
-  });
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && $("scrim").classList.contains("show")) closeSheet();
-  });
-
-  /* ---------- başlangıç ---------- */
-
-  var today = new Date().getDay();       // 0 pazar, 6 cumartesi
-  state.day = today === 0 ? 1 : 0;
-
-  render();
-})();
+  step.innerHTML = (i + 1) + " / " + PEOPLE.length + " — <b>" + PEOPLE[i].name + "</b>";
+}
+
+start.onclick = function () {
+  if (!msg.value.trim()) { msg.focus(); return; }
+  i = 0;
+  start.classList.add("hide");
+  run.classList.remove("hide");
+  show();
+};
+
+document.getElementById("open").onclick = function () {
+  window.open(wa(PEOPLE[i].tel, msg.value.trim()), "_blank", "noopener");
+  i++; show();
+};
+
+document.getElementById("skip").onclick = function () { i++; show(); };
 </script>
 </body>
 </html>
