@@ -30,6 +30,11 @@ h1{font-size:1.125rem;font-weight:650;letter-spacing:-.015em;margin:0 0 16px}
 h1 small{display:block;font-weight:400;font-size:.8125rem;color:var(--muted);margin-top:2px}
 :where(a,button,input):focus-visible{outline:2px solid var(--wa);outline-offset:2px}
 
+#frame{
+  margin:0 0 14px;padding:11px 13px;border-radius:12px;font-size:.875rem;line-height:1.45;
+  background:var(--card);border:1px solid var(--call);color:var(--ink);
+}
+#frame a{color:var(--call);font-weight:600;white-space:nowrap}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
 .tag{
   display:inline-block;background:var(--chip);color:var(--muted);border-radius:6px;
@@ -67,6 +72,8 @@ h1 small{display:block;font-weight:400;font-size:.8125rem;color:var(--muted);mar
 </head>
 <body>
 <main>
+  <p id="frame" hidden>Bu sayfa bir çerçeve içinde açıldı, tarayıcı butonları engelliyor.
+    <a id="frameOut" target="_blank" rel="noopener" href="#">Yeni sekmede aç →</a></p>
   <h1>Hafta sonu nöbet<small>Ara, ya da hepsine sırayla WhatsApp mesajı at</small></h1>
   <div id="list"></div>
 </main>
@@ -152,6 +159,12 @@ document.getElementById("copy").onclick = function () {
 };
 
 refresh();
+
+/* Çerçeve içinde açıldıysa tarayıcı tel: ve wa.me bağlantılarını engeller — çıkış yolu göster */
+if (window.self !== window.top) {
+  document.getElementById("frameOut").href = location.href;
+  document.getElementById("frame").hidden = false;
+}
 </script>
 </body>
 </html>
