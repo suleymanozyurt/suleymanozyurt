@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><title>Küstüm otu</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>html,body{margin:0;background:#F3EEE4}svg{display:block}text{font-family:'Inter','Inter Display','DejaVu Sans',sans-serif}</style></head>
+<body>
+<svg id="s" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1080 1920" width="1080" height="1920"></svg>
+<script>
+/* Küstüm otu açıklayıcı film — 9:16. Her kare t'nin saf fonksiyonudur: window.seek(t). */
+const Q=new URLSearchParams(location.search);
+const REDUCED=Q.get('reduced')==='1';
+const BPM=90,B=60/BPM,b=n=>n*B,W=1080,H=1920;
+const C={bg:'#F3EEE4',panel:'#E7E0D0',panel2:'#D8D0BE',ink:'#1F2A1C',muted:'#4A5546',leaf:'#4E8F45',leafDk:'#2E5E2A',accent:'#B0246E',pill:'#1B2418',cream:'#F7F2E8'};
+const PHOTO='__PHOTO__';
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const clamp=(x,a=0,c=1)=>Math.min(c,Math.max(a,x));
+const ease=p=>{p=clamp(p);return REDUCED?(p>0?1:0):1-Math.pow(1-p,4)};
+const pr=(t,a,d)=>ease((t-a)/d);
+const lerp=(a,c,k)=>a+(c-a)*k;
+
+const TIMELINE={
+  bpm:BPM,duration:b(80),
+  scenes:[
+    {id:'hook',t0:0,t1:b(8)},{id:'model',t0:b(8),t1:b(24)},{id:'proof',t0:b(24),t1:b(40)},
+    {id:'cost',t0:b(40),t1:b(56)},{id:'night',t0:b(56),t1:b(68),fadeOut:true},{id:'close',t0:b(68),t1:b(80)}],
+  text:[
+    {t0:b(1.5),t1:b(7.8),pill:true,lines:['Küstüm otu dokununca','yaprağını kapatır. Neden?']},
+    {t0:b(9),t1:b(15),lines:['Dokunuş sinyale dönüşür,','eklem suyunu boşaltır.']},
+    {t0:b(15.5),t1:b(23.5),lines:['Yaprak katlanır.','Kas yok, sinir yok.']},
+    {t0:b(25.5),t1:b(39),lines:['Hareketsiz yaprağı çekirge','yaklaşık iki kat fazla yedi.']},
+    {t0:b(41),t1:b(55),lines:['Gündüz kapanmaya zorlanınca','üreme kütlesi %47 azaldı.']},
+    {t0:b(57),t1:b(67),lines:['Gece zaten kapanıyor.','Zamanlama her şeyi değiştirir.']},
+    {t0:b(69),t1:b(74.5),pill:true,lines:['Koruma mı, büyüme mi?']},
+    {t0:b(75),t1:b(79.6),pill:true,lines:['Bitki dengeyi hücrelerindeki','suyla kuruyor.']}],
+  camera:[
+    {t:0,cx:540,cy:960,z:1.0},{t:b(2),cx:540,cy:960,z:1.0},{t:b(7.5),cx:996,cy:1000,z:1.15},
+    {t:b(68),cx:996,cy:1000,z:1.15},{t:b(80),cx:768,cy:960,z:1.0}],
+  /* ses cue'ları (vuruş cinsinden) renderAudio tarafından kullanılır */
+  cues:[
+    ['motif',2],['touch',10.5],['signal',11.5],['drops',13],['fold',14.2],
+    ['grow',27],['thud',31],['chime2x',33],['thud2',42],['swish',46],
+    ['chimeDay',57],['chimeNight',60],['fold',62],['motif',75],['resolve',77]]
+};
+
+/* ---------- DOM ---------- */
+const svg=document.getElementById('s');
+const NS='http://www.w3.org/2000/svg';
+function leafMarkup(id,n){let s=`<g id="${id}"><line id="${id}_r" stroke="${C.leafDk}" stroke-width="7" stroke-linecap="round"/>`;
+  for(let i=0;i<n;i++)for(const k of['u','l'])s+=`<path id="${id}_${k}${i}" fill="${C.leaf}" stroke="${C.leafDk}" stroke-width="3" stroke-linejoin="round"/>`;
+  return s+'</g>';}
+function sunMarkup(id,cx,cy,r){let s=`<g id="${id}" stroke="${C.ink}" stroke-width="8" stroke-linecap="round" fill="none"><circle cx="${cx}" cy="${cy}" r="${r}"/>`;
+  for(let i=0;i<12;i++){const a=i*Math.PI/6;s+=`<line x1="${cx+Math.cos(a)*(r+22)}" y1="${cy+Math.sin(a)*(r+22)}" x2="${cx+Math.cos(a)*(r+54)}" y2="${cy+Math.sin(a)*(r+54)}"/>`}
+  return s+'</g>';}
+function moonMarkup(id,cx,cy){return `<path id="${id}" fill="none" stroke="${C.ink}" stroke-width="8" stroke-linejoin="round" d="M ${cx+10} ${cy-78} A 80 80 0 1 0 ${cx+10} ${cy+78} A 112 112 0 0 1 ${cx+10} ${cy-78} Z"/>`;}
+
+svg.innerHTML=`
+<defs>
+  <image id="phimg" href="${PHOTO}" x="0" y="0" width="1536" height="1920" preserveAspectRatio="none"/>
+  <clipPath id="cardclip"><rect x="90" y="150" width="900" height="620" rx="36"/></clipPath>
+  <pattern id="hatch" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <rect width="22" height="22" fill="${C.accent}"/><rect width="8" height="22" fill="${C.bg}"/></pattern>
+</defs>
+<rect width="1080" height="1920" fill="#2a3326"/>
+<g id="photo"><use href="#phimg"/></g>
+
+<!-- S2 model -->
+<g id="sc_model"><rect width="1080" height="1920" fill="${C.bg}"/>
+  <g clip-path="url(#cardclip)"><g transform="translate(90 150) scale(1.026) translate(-643 -739)"><use href="#phimg"/></g></g>
+  <rect x="120" y="706" width="400" height="46" rx="23" fill="${C.pill}" fill-opacity=".86"/>
+  <text x="320" y="739" text-anchor="middle" font-size="28" font-weight="600" fill="${C.cream}">Katlanmış yaprakçıklar</text>
+  ${leafMarkup('lf2',7)}
+  <circle id="joint" cx="250" cy="1090" r="40" fill="${C.accent}" fill-opacity=".35" stroke="${C.accent}" stroke-width="7"/>
+  <g id="drops" fill="${C.accent}"></g>
+  <circle id="touchring" cx="900" cy="1090" r="0" fill="none" stroke="${C.accent}" stroke-width="7"/>
+  <circle id="sigdot" cx="900" cy="1090" r="20" fill="${C.accent}"/>
+  <text x="900" y="1000" text-anchor="middle" font-size="42" font-weight="600" fill="${C.ink}">dokunuş</text>
+  <text x="250" y="1210" text-anchor="middle" font-size="42" font-weight="600" fill="${C.ink}">eklem</text>
+</g>
+
+<!-- S3 proof -->
+<g id="sc_proof"><rect width="1080" height="1920" fill="${C.bg}"/>
+  <text x="540" y="250" text-anchor="middle" font-size="46" font-weight="700" fill="${C.ink}">Yaprak ağırlığı kaybı (%)</text>
+  <line x1="110" y1="1300" x2="970" y2="1300" stroke="${C.ink}" stroke-width="5"/>
+  <rect id="bar1" x="160" y="1300" width="280" height="0" fill="${C.leaf}"/>
+  <rect id="bar2" x="640" y="1300" width="280" height="0" fill="url(#hatch)" stroke="${C.accent}" stroke-width="5"/>
+  <text id="val1" x="300" y="1280" text-anchor="middle" font-size="64" font-weight="800" fill="${C.ink}"></text>
+  <text id="val2" x="780" y="1280" text-anchor="middle" font-size="64" font-weight="800" fill="${C.accent}"></text>
+  <text x="300" y="1368" text-anchor="middle" font-size="48" font-weight="600" fill="${C.ink}">Hareketli</text>
+  <text x="780" y="1368" text-anchor="middle" font-size="48" font-weight="600" fill="${C.ink}">Hareketsiz</text>
+  <text id="x2" x="300" y="760" text-anchor="middle" font-size="150" font-weight="800" fill="${C.accent}">≈2×</text>
+  <text x="540" y="1760" text-anchor="middle" font-size="30" font-weight="500" fill="${C.muted}">Hagihara ve ark., Nature Communications, 2022</text>
+</g>
+
+<!-- S4 cost -->
+<g id="sc_cost"><rect width="1080" height="1920" fill="${C.bg}"/>
+  ${sunMarkup('sun4',540,330,86)}
+  ${leafMarkup('lf4',4)}
+  <text id="n47" x="540" y="960" text-anchor="middle" font-size="300" font-weight="800" fill="${C.accent}">−%47</text>
+  <text id="n47l" x="540" y="1044" text-anchor="middle" font-size="46" font-weight="600" fill="${C.ink}">üreme kütlesi</text>
+  <rect x="140" y="1120" width="800" height="72" rx="14" fill="${C.leaf}"/>
+  <rect id="gauge" x="940" y="1120" width="0" height="72" fill="url(#hatch)"/>
+  <rect x="140" y="1120" width="800" height="72" rx="14" fill="none" stroke="${C.ink}" stroke-width="5"/>
+  <text id="gl" x="752" y="1250" text-anchor="middle" font-size="40" font-weight="600" fill="${C.accent}">kayıp</text>
+  <text x="540" y="1760" text-anchor="middle" font-size="30" font-weight="500" fill="${C.muted}">Dokunmanın kendi etkisi ayrıldıktan sonra</text>
+</g>
+
+<!-- S5 night -->
+<g id="sc_night"><rect width="1080" height="1920" fill="${C.bg}"/>
+  <g id="dayp"><rect x="90" y="170" width="900" height="520" rx="36" fill="${C.panel}"/>
+    <text x="140" y="258" font-size="54" font-weight="800" fill="${C.ink}">Gündüz</text>
+    ${sunMarkup('sun5',270,480,64)}
+    ${leafMarkup('lf5a',4)}</g>
+  <g id="nightp"><rect x="90" y="740" width="900" height="520" rx="36" fill="${C.panel2}"/>
+    <text x="140" y="828" font-size="54" font-weight="800" fill="${C.ink}">Gece</text>
+    ${moonMarkup('moon5',270,1050)}
+    ${leafMarkup('lf5b',4)}</g>
+</g>
+`;
+const $=id=>document.getElementById(id);
+
+/* ---------- yaprak çizimi ---------- */
+const LEAVES={
+  lf2:{x0:340,y:1090,n:7,sp:80,rx:70,ry:27,r0:250,r1:850},
+  lf4:{x0:395,y:640,n:4,sp:95,rx:72,ry:22,r0:355,r1:770},
+  lf5a:{x0:500,y:480,n:4,sp:95,rx:72,ry:22,r0:460,r1:875},
+  lf5b:{x0:500,y:1050,n:4,sp:95,rx:72,ry:22,r0:460,r1:875}};
+function leafPath(rx,ry){return `M0 0 C ${rx*.3} ${-ry*1.3} ${rx*.8} ${-ry*1.2} ${rx} 0 C ${rx*.8} ${ry*1.2} ${rx*.3} ${ry*1.3} 0 0Z`}
+for(const id in LEAVES){const L=LEAVES[id];const d=leafPath(L.rx,L.ry);
+  const r=$(id+'_r');r.setAttribute('x1',L.r0);r.setAttribute('x2',L.r1);r.setAttribute('y1',L.y);r.setAttribute('y2',L.y);
+  for(let i=0;i<L.n;i++){$(id+'_u'+i).setAttribute('d',d);$(id+'_l'+i).setAttribute('d',d);}}
+function setLeaf(id,thetaOf){const L=LEAVES[id];
+  for(let i=0;i<L.n;i++){const th=thetaOf(i),x=L.x0+i*L.sp;
+    $(id+'_u'+i).setAttribute('transform',`translate(${x} ${L.y}) rotate(${-th})`);
+    $(id+'_l'+i).setAttribute('transform',`translate(${x} ${L.y}) rotate(${th})`);}}
+
+/* ---------- yazı katmanı ---------- */
+const FS=62,LH=84,YC=1560;
+const tl=document.createElementNS(NS,'g');svg.appendChild(tl);
+const mc=document.createElement('canvas').getContext('2d');
+mc.font=`700 ${FS}px Inter`;
+const TXT=TIMELINE.text.map(it=>{
+  const g=document.createElementNS(NS,'g');
+  const w=Math.max(...it.lines.map(l=>mc.measureText(l).width));
+  const bh=it.lines.length*LH;
+  let h='';
+  if(it.pill)h+=`<rect x="${540-w/2-44}" y="${YC-bh/2-30}" width="${w+88}" height="${bh+60}" rx="40" fill="${C.pill}" fill-opacity=".88"/>`;
+  it.lines.forEach((l,i)=>{h+=`<text x="540" y="${YC-bh/2+i*LH+60}" text-anchor="middle" font-size="${FS}" font-weight="700" fill="${it.pill?C.cream:C.ink}">${l}</text>`});
+  g.innerHTML=h;tl.appendChild(g);return g;});
+
+/* ---------- seek ---------- */
+function sceneOp(id,t){const S=TIMELINE.scenes,i=S.findIndex(x=>x.id===id),sc=S[i];
+  const inn=i===0?1:pr(t,sc.t0,.5);
+  let out=1;
+  if(i<S.length-1){out=sc.fadeOut?1-pr(t,sc.t1,.5):(t<sc.t1+.5?1:0);}
+  return inn*out;}
+function camAt(t){const K=TIMELINE.camera;let i=0;while(i<K.length-2&&t>=K[i+1].t)i++;
+  const a=K[i],c=K[i+1],k=ease((t-a.t)/(c.t-a.t));
+  const z=lerp(a.z,c.z,k);
+  return{z,cx:clamp(lerp(a.cx,c.cx,k),540/z,1536-540/z),cy:clamp(lerp(a.cy,c.cy,k),960/z,1920-960/z)};}
+
+const droneRng=mulberry32(7);const DROPX=[...Array(6)].map(()=>droneRng());
+$('drops').innerHTML=DROPX.map((_,i)=>`<circle id="dr${i}" r="11" cx="250" cy="1080" opacity="0"/>`).join('');
+
+function seek(t){
+  t=clamp(t,0,TIMELINE.duration);
+  const cam=camAt(t);
+  $('photo').setAttribute('transform',`translate(540 960) scale(${cam.z}) translate(${-cam.cx} ${-cam.cy})`);
+  for(const s of TIMELINE.scenes){const g=$('sc_'+s.id);if(!g)continue;const o=sceneOp(s.id,t);g.setAttribute('opacity',o);g.style.display=o>0.001?'':'none';}
+
+  /* S2 */
+  setLeaf('lf2',i=>lerp(78,7,pr(t,b(14.2)+(6-i)*.12,1.2)));
+  const tr=pr(t,b(10.5),.8);
+  $('touchring').setAttribute('r',60*tr);$('touchring').setAttribute('opacity',t>=b(10.5)?1-tr:0);
+  const sg=clamp((t-b(11.5))/(b(14)-b(11.5)));
+  $('sigdot').setAttribute('cx',lerp(900,250,REDUCED?(sg>0?1:0):sg*sg*(3-2*sg)));
+  $('sigdot').setAttribute('opacity',t>=b(11.5)&&t<b(14)+.2?1:0);
+  const dr=pr(t,b(13.2),b(2));
+  $('joint').setAttribute('r',lerp(40,24,dr));
+  DROPX.forEach((rx,i)=>{const k=clamp((t-b(13.2)-i*.18)/.9);
+    const e=REDUCED?(k>0?1:0):k;
+    const c=$('dr'+i);c.setAttribute('cx',250+(rx-.5)*70);c.setAttribute('cy',1090+38+e*120);
+    c.setAttribute('opacity',(k>0&&k<1)||(REDUCED&&k>0&&t<b(15))?1-(REDUCED?0:k*k):0);});
+
+  /* S3 */
+  const g1=pr(t,b(27),b(3.5)),g2=pr(t,b(27.6),b(3.5));
+  $('bar1').setAttribute('height',18.9*16*g1);$('bar1').setAttribute('y',1300-18.9*16*g1);
+  $('bar2').setAttribute('height',38*16*g2);$('bar2').setAttribute('y',1300-38*16*g2);
+  const fmt=v=>'%'+v.toFixed(1).replace('.',',');
+  $('val1').textContent=g1>0.02?fmt(18.9*g1):'';$('val1').setAttribute('y',1300-18.9*16*g1-20);
+  $('val2').textContent=g2>0.02?fmt(38*g2):'';$('val2').setAttribute('y',1300-38*16*g2-20);
+  $('x2').setAttribute('opacity',pr(t,b(33),.7));
+  $('x2').setAttribute('transform',`translate(0 ${(1-pr(t,b(33),.7))*30})`);
+
+  /* S4 */
+  $('sun4').setAttribute('opacity',pr(t,b(40.5),.8));
+  setLeaf('lf4',()=>7);$('lf4').setAttribute('opacity',pr(t,b(41),.8));
+  const nk=pr(t,b(42),.8);
+  $('n47').setAttribute('opacity',nk);$('n47').setAttribute('transform',`translate(0 ${(1-nk)*40})`);
+  $('n47l').setAttribute('opacity',pr(t,b(43),.6));
+  const gk=pr(t,b(45),b(3));
+  $('gauge').setAttribute('width',376*gk);$('gauge').setAttribute('x',940-376*gk);
+  $('gl').setAttribute('opacity',pr(t,b(47.5),.6));
+
+  /* S5 */
+  const dk=pr(t,b(57),.7),nk5=pr(t,b(60),.7);
+  $('dayp').setAttribute('opacity',dk);$('nightp').setAttribute('opacity',nk5);
+  setLeaf('lf5a',()=>78);setLeaf('lf5b',i=>lerp(78,7,pr(t,b(62)+(3-i)*.1,1.2)));
+
+  /* yazı */
+  TIMELINE.text.forEach((it,i)=>{const g=TXT[i];
+    const k=pr(t,it.t0,.6),o=1-pr(t,it.t1-.4,.4);
+    g.setAttribute('opacity',k*o);g.setAttribute('transform',`translate(0 ${(1-k)*24})`);});
+}
+window.TIMELINE=TIMELINE;window.seek=seek;seek(0);
+
+/* ---------- ses ---------- */
+window.renderAudio=async function(){
+  const SR=48000,dur=TIMELINE.duration+1.2;
+  const oc=new OfflineAudioContext(2,Math.ceil(SR*dur),SR);
+  const comp=oc.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=3;comp.connect(oc.destination);
+  const master=oc.createGain();master.gain.setValueAtTime(.9,0);
+  master.gain.setValueAtTime(.9,b(76));master.gain.linearRampToValueAtTime(0.0001,TIMELINE.duration+.9);
+  master.connect(comp);
+  const rng=mulberry32(11);
+  const env=(g,t,a,d,pk)=>{g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(pk,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+d);};
+  const tone=(t,f,d,pk,type='triangle',lp=2600,pan=0,a=.015)=>{
+    const o=oc.createOscillator();o.type=type;o.frequency.value=f;
+    const g=oc.createGain();env(g,t,a,d,pk);
+    const l=oc.createBiquadFilter();l.type='lowpass';l.frequency.value=lp;
+    const p=oc.createStereoPanner();p.pan.value=pan;
+    o.connect(l);l.connect(g);g.connect(p);p.connect(master);o.start(t);o.stop(t+a+d+.05);};
+  const sweep=(t,f0,f1,d,pk,type='sine')=>{
+    const o=oc.createOscillator();o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+d);
+    const g=oc.createGain();env(g,t,d*.2,d*.8,pk);o.connect(g);g.connect(master);o.start(t);o.stop(t+d+.1);};
+  const noise=(t,d,pk,hp)=>{
+    const buf=oc.createBuffer(1,Math.ceil(SR*d),SR),x=buf.getChannelData(0);for(let i=0;i<x.length;i++)x[i]=rng()*2-1;
+    const s=oc.createBufferSource();s.buffer=buf;const f=oc.createBiquadFilter();f.type='highpass';f.frequency.value=hp;
+    const g=oc.createGain();env(g,t,.01,d,pk);s.connect(f);f.connect(g);g.connect(master);s.start(t);};
+  const hz=m=>440*Math.pow(2,(m-69)/12);
+  /* altyapı: Am – F – C – G, 8 vuruşluk akor, 90 BPM */
+  const CH=[[45,52,57,60],[41,48,53,57],[48,55,60,64],[43,50,55,59]];
+  for(let c=0;c<10;c++){const t0=b(c*8),ch=CH[c%4];
+    ch.forEach((m,i)=>{const o=oc.createOscillator();o.type=i<1?'sine':'triangle';o.frequency.value=hz(m);o.detune.value=(i-1.5)*4;
+      const g=oc.createGain();const pk=i<1?.07:.03;
+      g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(pk,t0+b(1.5));g.gain.setValueAtTime(pk,t0+b(7));g.gain.linearRampToValueAtTime(0,t0+b(8.5));
+      const l=oc.createBiquadFilter();l.type='lowpass';l.frequency.value=900;
+      o.connect(l);l.connect(g);g.connect(master);o.start(t0);o.stop(t0+b(8.6));});
+    for(let k=0;k<16;k++){const t=t0+k*b(.5);if(t<b(2))continue;
+      const m=ch[1+[0,1,2,1,2,3,2,1][k%8]%3]+12;
+      tone(t,hz(m),.5,.028,'triangle',2400,(k%2?.3:-.3));}}
+  /* cue'lar */
+  const motif=t=>{[69,72,76].forEach((m,i)=>{tone(t+i*b(.5),hz(m),.9,.07,'sine',4000,0,.01);tone(t+i*b(.5),hz(m+12),.6,.025,'sine',5000,0,.01);});};
+  for(const[name,bt]of TIMELINE.cues){const t=b(bt);
+    if(name==='motif')motif(t);
+    else if(name==='touch'){noise(t,.12,.06,3000);tone(t,880,.15,.07,'sine');}
+    else if(name==='signal')sweep(t,380,900,b(2.5),.04);
+    else if(name==='drops'){for(let i=0;i<5;i++)sweep(t+i*.18,1300-i*80,700,.16,.05);}
+    else if(name==='fold')sweep(t,520,230,b(3),.045);
+    else if(name==='grow')sweep(t,260,700,b(3.5),.05,'triangle');
+    else if(name==='thud'){tone(t,70,.5,.2,'sine',300);}
+    else if(name==='chime2x'){tone(t,hz(76),1.2,.07,'sine',5000);tone(t+.08,hz(83),1.2,.05,'sine',5000);}
+    else if(name==='thud2'){tone(t,52,.9,.28,'sine',250);noise(t,.2,.03,800);}
+    else if(name==='swish'){noise(t,b(3),.035,1800);}
+    else if(name==='chimeDay'){tone(t,hz(79),1,.06,'sine',5000);tone(t+.14,hz(84),1,.04,'sine',5000);}
+    else if(name==='chimeNight'){tone(t,hz(64),1.4,.07,'sine',3000);tone(t+.18,hz(59),1.4,.05,'sine',3000);}
+    else if(name==='resolve'){[57,64,69,72].forEach((m,i)=>tone(t+i*.03,hz(m),b(3.5),.05,'sine',3500,0,.05));}}
+  const buf=await oc.startRendering();
+  const L=buf.getChannelData(0),R=buf.getChannelData(1),n=L.length,out=new Int16Array(n*2);
+  for(let i=0;i<n;i++){out[2*i]=clamp(L[i],-1,1)*32767;out[2*i+1]=clamp(R[i],-1,1)*32767;}
+  const bytes=new Uint8Array(out.buffer);let bin='';const CH2=0x8000;
+  for(let i=0;i<bytes.length;i+=CH2)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH2));
+  return btoa(bin);
+};
+</script></body></html>
