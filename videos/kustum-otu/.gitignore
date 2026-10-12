@@ -8,3 +8,5 @@ out/b.png
 out/v.png
 out/*.log
 photo.jpg.bak
+vo_clone/
+out_private/

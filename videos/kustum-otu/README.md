@@ -17,3 +17,7 @@ Yeniden üretim: `python3 build.py` → `NODE_PATH=/opt/node22/lib/node_modules 
 ## Seslendirme durumu
 - `out/kustum_otu_9x16_sesli_kismi.mp4`: 5/6 sahne seslendirmeli (1, 2, 3, 5, 6); 4. sahne (%47) yalnız ekran metniyle. Ses: −16,8 LUFS, tepe −1,5 dBFS (tek geçişli loudnorm; hedef −16 LUFS'tan 0,8 LU sapma). Seslendirmenin Türkçe telaffuzu ve senkronu kulakla DEĞERLENDİRİLMEDİ; yalnız süreler (ffprobe) ve metin pencereleriyle karşılaştırıldı.
 - Karıştırma: `sh mix.sh out/silent_n.mp4 out/<çıktı>.mp4`.
+
+## Klon sesli sürüm (repo dışı: out_private/)
+- `clone_tts.py` ile üretilir; `VO=vo_clone/final sh mix.sh out/silent_n.mp4 out_private/<ad>.mp4`.
+- Ölçüm: −16,4 LUFS, tepe −1,5 dBFS; süre 53,33 sn. Telaffuz/benzerlik kulakla DEĞERLENDİRİLMEDİ.
