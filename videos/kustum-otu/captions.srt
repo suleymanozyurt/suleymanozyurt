@@ -29,10 +29,10 @@ Gece zaten kapanıyor.
 Zamanlama her şeyi değiştirir.
 
 7
-00:00:46,000 --> 00:00:49,667
+00:00:46,000 --> 00:00:47,867
 Koruma mı, büyüme mi?
 
 8
-00:00:50,000 --> 00:00:53,067
+00:00:48,133 --> 00:00:53,067
 Bitki dengeyi hücrelerindeki
 suyla kuruyor.
