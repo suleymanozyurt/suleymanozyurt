@@ -1,0 +1,12 @@
+out/seg_*
+out/silent_*
+out/list_*
+out/bed*
+out/stills/
+out/a.png
+out/b.png
+out/v.png
+out/*.log
+photo.jpg.bak
+vo_clone/
+out_private/
